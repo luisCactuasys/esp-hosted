@@ -1,0 +1,5 @@
+version: "0.0.1"
+description: esp_hosted_master component is a part of two chip solution. master part built with any host can re-use  Wi-Fi or Bluetooth running over co-processor chip using esp_hosted_slave.
+dependencies:
+  idf:
+    version: ">=5.1"
