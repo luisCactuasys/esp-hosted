@@ -1,4 +1,4 @@
-version: "0.0.1"
+version: "0.0.2"
 description: esp_hosted_slave component is a part of two chip solution. slave part provides Wi-Fi or Bluetooth as co-processor to the host part.
 dependencies:
   idf:
