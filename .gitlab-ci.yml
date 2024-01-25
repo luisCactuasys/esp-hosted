@@ -90,7 +90,7 @@ deploy_esp32p4_github:
       - git remote add github git@github.com:espressif/esp-hosted.git
       - git push -f github "${CI_COMMIT_SHA}:refs/heads/${CI_COMMIT_REF_NAME}"
 
-.deploy_esp_hosted_comp:
+deploy_esp_hosted_comp:
   stage: deploy
   image: python:3.11-alpine
   tags:
