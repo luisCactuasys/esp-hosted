@@ -1,10 +1,13 @@
 stages:
+  - build
   - deploy
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-before_script:
+setup_ssh:
+  stage: build
+  script:
   # add gitlab ssh key
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
@@ -12,7 +15,6 @@ before_script:
   - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
   - chmod 600 ~/.ssh/id_rsa
   - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-allow_failure: true
 
 deploy_master_github:
   stage: deploy
@@ -32,6 +34,8 @@ deploy_master_github:
       - git remote remove github &>/dev/null || true
       - git remote add github git@github.com:espressif/esp-hosted.git
       - git push github "${CI_COMMIT_SHA}:refs/heads/${CI_COMMIT_REF_NAME}"
+  dependencies:
+    - setup_ssh
 
 .deploy_force_master_github:
   stage: deploy
@@ -51,7 +55,8 @@ deploy_master_github:
       - git remote remove github &>/dev/null || true
       - git remote add github git@github.com:espressif/esp-hosted.git
       - git push -f github "${CI_COMMIT_SHA}:refs/heads/${CI_COMMIT_REF_NAME}"
-
+  dependencies:
+    - setup_ssh
 
 deploy_esp32p4_github:
   stage: deploy
@@ -71,6 +76,8 @@ deploy_esp32p4_github:
       - git remote remove github &>/dev/null || true
       - git remote add github git@github.com:espressif/esp-hosted.git
       - git push github "${CI_COMMIT_SHA}:refs/heads/${CI_COMMIT_REF_NAME}"
+  dependencies:
+    - setup_ssh
 
 .deploy_force_esp32p4_github:
   stage: deploy
@@ -90,7 +97,9 @@ deploy_esp32p4_github:
       - git remote remove github &>/dev/null || true
       - git remote add github git@github.com:espressif/esp-hosted.git
       - git push -f github "${CI_COMMIT_SHA}:refs/heads/${CI_COMMIT_REF_NAME}"
-
+  dependencies:
+    - setup_ssh
+    
 deploy_esp_hosted_comp:
   stage: deploy
   image: $CI_DOCKER_REGISTRY/esp32-ci-env
