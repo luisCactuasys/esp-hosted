@@ -92,7 +92,7 @@ deploy_esp32p4_github:
 
 deploy_esp_hosted_comp:
   stage: deploy
-  image: python:3.11-alpine
+  image: $CI_DOCKER_REGISTRY/esp32-ci-env
   tags:
     - build
   when: always
