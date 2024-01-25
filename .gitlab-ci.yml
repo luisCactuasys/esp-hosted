@@ -104,8 +104,8 @@ deploy_esp_hosted_comp:
     - cp -r common host/
     - cp -r common slave/
     - cd host
-    - python -m idf_component_manager upload-component --allow-existing --name esp_hosted_master --namespace=mantriyogesh
+    - python -m idf_component_manager upload-component --name esp_hosted_master --namespace=mantriyogesh
     - cd ../slave
-    - python -m idf_component_manager upload-component --allow-existing --name esp_hosted_slave --namespace=mantriyogesh
+    - python -m idf_component_manager upload-component --name esp_hosted_slave --namespace=mantriyogesh
 
 
