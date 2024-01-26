@@ -5,16 +5,41 @@ on:
       - feature/esp_as_mcu_host
 
 jobs:
-  upload_components:
+  create_components:
+    runs-on: ubuntu-latest
+    steps:
+      - run: python -m pip install --upgrade idf-component-manager
+      - run: cp -r common host/
+      - run: cp -r common slave/
+
+  upload_component_host:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: "recursive"
 
-      - name: Upload component to the component registry
+      - name: Upload host component to the component registry
         uses: espressif/upload-components-ci-action@v1
         with:
-          name: "esp_hosted"
+          directories: "host"
+          name: "esp_hosted_host"
           namespace: "mantriyogesh"
           api_token: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
+    needs: [create_components]
+
+  upload_component_slave:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - name: Upload slave component to the component registry
+        uses: espressif/upload-components-ci-action@v1
+        with:
+          directories: "slave"
+          name: "esp_hosted_slave"
+          namespace: "mantriyogesh"
+          api_token: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
+    needs: [create_components]
