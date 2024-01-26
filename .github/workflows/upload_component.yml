@@ -2,44 +2,32 @@ name: Push component to https://components.espressif.com
 on:
   push:
     branches:
-      - feature/esp_as_mcu_host
+      - feature/ext_component_host
 
 jobs:
-  create_components:
-    runs-on: ubuntu-latest
-    steps:
-      - run: python -m pip install --upgrade idf-component-manager
-      - run: cp -r common host/
-      - run: cp -r common slave/
-
-  upload_component_host:
+  upload_components:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: "recursive"
-
+      - run: cp -r common host/
+      - run: cp -r common slave/
+      - run: mv host esp_host
+      - run: mv slave esp_slave
+      - run: cp -rf esp_host/idf_component.yml ./
+      - run: python -m pip install --upgrade idf-component-manager
       - name: Upload host component to the component registry
         uses: espressif/upload-components-ci-action@v1
         with:
-          directories: "host"
-          name: "esp_hosted_host"
-          namespace: "mantriyogesh"
+          directories: "esp_host"
+          namespace: "espressif"
           api_token: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
-    needs: [create_components]
-
-  upload_component_slave:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: "recursive"
-
+      - run: cp -rf esp_slave/idf_component.yml ./
       - name: Upload slave component to the component registry
         uses: espressif/upload-components-ci-action@v1
         with:
-          directories: "slave"
-          name: "esp_hosted_slave"
-          namespace: "mantriyogesh"
+          directories: "esp_slave"
+          namespace: "espressif"
           api_token: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
-    needs: [create_components]
+

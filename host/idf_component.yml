@@ -1,5 +1,8 @@
-version: "0.0.3"
-description: esp_hosted_master component is a part of two chip solution. master part built with any host can re-use  Wi-Fi or Bluetooth running over co-processor chip using esp_hosted_slave.
+version: "0.0.4"
+description: esp_host component is a part of two chip solution, 'esp-hosted'.
+  Any Host chipset (for example, ESP32-P4), which doesn't have native Wi-Fi and/or bluetooth support can use ESP-Hosted solution.
+  Host while building should include 'esp-host' as external component.
+  The slave chipset would be already flashed with 'esp_slave' component. This slave chipset as communication co-processor.
 dependencies:
   idf:
     version: ">=5.1"

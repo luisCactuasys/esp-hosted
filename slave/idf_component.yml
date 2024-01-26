@@ -1,5 +1,8 @@
-version: "0.0.3"
+version: "0.0.4"
 description: esp_hosted_slave component is a part of two chip solution. slave part provides Wi-Fi or Bluetooth as co-processor to the host part.
+description: esp_slave component is a part of two chip solution, 'esp-hosted'.
+  Any ESP chipset which has native Wi-Fi and/or Bluetooth, can act as communication co-processor chip.
+  This chipset would be termed as slave chipset and would flash 'esp_slave' component.
 dependencies:
   idf:
     version: ">=5.1"
