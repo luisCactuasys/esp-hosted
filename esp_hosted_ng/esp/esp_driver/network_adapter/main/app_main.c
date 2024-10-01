@@ -486,7 +486,10 @@ void process_rx_pkt(interface_buffer_handle_t *buf_handle)
 	struct esp_payload_header *header = NULL;
 	uint8_t *payload = NULL;
 	uint16_t payload_len = 0;
-        unsigned char m3_PWlvl[] = {0x26, 0xFC};
+    
+	unsigned char m3_PWlvl[] = {0x26, 0xFC};
+	interface_buffer_handle_t m3_buf_handle = {0};
+	uint8_t m3_resp_buf[10] = {0};
 
 	header = (struct esp_payload_header *) buf_handle->payload;
 	payload = buf_handle->payload + le16toh(header->offset);
@@ -533,6 +536,19 @@ void process_rx_pkt(interface_buffer_handle_t *buf_handle)
                                         TODO: make a proper function to do this
                                 */
                                 ret = esp_ble_tx_power_set(power_type, power_level);
+								ESP_LOG_BUFFER_HEXDUMP("M3 - PWlvl", &ret, 4, ESP_LOG_INFO);
+
+								/*
+								 * Send the responde to Host Linux (TUX100)
+								*/
+								m3_buf_handle.if_type = ESP_HCI_IF;
+								m3_buf_handle.if_num = 0;
+
+								m3_buf_handle.payload = m3_resp_buf;
+								m3_buf_handle.payload_len = 10;
+
+								ret = send_to_host(PRIO_Q_LOW, &m3_buf_handle);
+
                                 ESP_LOG_BUFFER_HEXDUMP("M3 - PWlvl", &ret, 4, ESP_LOG_INFO);
                         }
                         else    // Fallback to normal operation (esp-hosted/esp-idf implementation)
