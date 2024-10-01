@@ -486,6 +486,7 @@ void process_rx_pkt(interface_buffer_handle_t *buf_handle)
 	struct esp_payload_header *header = NULL;
 	uint8_t *payload = NULL;
 	uint16_t payload_len = 0;
+        unsigned char m3_PWlvl[] = {0x26, 0xFC};
 
 	header = (struct esp_payload_header *) buf_handle->payload;
 	payload = buf_handle->payload + le16toh(header->offset);
@@ -521,8 +522,26 @@ void process_rx_pkt(interface_buffer_handle_t *buf_handle)
 		}
 #if defined(CONFIG_BT_ENABLED) && BLUETOOTH_HCI
 		else if (buf_handle->if_type == ESP_HCI_IF) {
-			/*ESP_LOG_BUFFER_HEXDUMP("H->S BT", payload, payload_len, ESP_LOG_INFO);*/
-			process_hci_rx_pkt(payload, payload_len);
+			
+			ESP_LOG_BUFFER_HEXDUMP("H->S BT", payload, payload_len, ESP_LOG_INFO);
+                        if(!memcmp(payload, m3_PWlvl, sizeof(m3_PWlvl)))        //compare the command OPCODE, OGF, OCF for setting BLE TX power level
+                        {
+                                esp_err_t ret = 0;
+                                esp_ble_power_type_t power_type = payload[3];
+                                esp_power_level_t power_level = payload[4];
+                                /*
+                                        TODO: make a proper function to do this
+                                */
+                                ret = esp_ble_tx_power_set(power_type, power_level);
+                                ESP_LOG_BUFFER_HEXDUMP("M3 - PWlvl", &ret, 4, ESP_LOG_INFO);
+                        }
+                        else    // Fallback to normal operation (esp-hosted/esp-idf implementation)
+                        {
+                                process_hci_rx_pkt(payload, payload_len);
+                        }
+
+			
+			
 		}
 #endif
 		else if (buf_handle->if_type == ESP_TEST_IF) {

@@ -284,6 +284,7 @@ void debug_log_firmware_version(void)
 	ESP_LOGI(TAG, "                Transport used :: SDIO only                     ");
   #endif
 #endif
+	ESP_LOGI(TAG, "                SOU LINDO! VERSÃO 1.0.3	novo		");
 	ESP_LOGI(TAG, "*********************************************************************");
 }
 
