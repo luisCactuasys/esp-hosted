@@ -14,3 +14,11 @@ esp_hosted_ng/esp/esp_driver/cmake_install.cmake
 esp_hosted_ng/esp/esp_driver/network_adapter/build
 esp_hosted_ng/esp/esp_driver/network_adapter/sdkconfig
 esp_hosted_ng/esp/esp_driver/network_adapter/sdkconfig.old
+*.o
+*.ko
+*.cmd
+*.swp
+*.symvers
+*.order
+*.mod
++.mod.c
