@@ -538,14 +538,16 @@ void process_rx_pkt(interface_buffer_handle_t *buf_handle)
 			 *	- Power type	This is the type of channel to change the Transmission power. 0x09 for Advertisement 
 			 *  - Power level	This the level of the Transmission power for the given channel
 			 * 
-			 * Please refer to esp-idf:esp_bt.h for the possible values of Power type and Power level
+			 * Please refer to "esp-idf:esp_bt.h" for the possible values of Power type and Power level
 			 * 		- esp_ble_power_type_t
 			 * 		- esp_power_level_t
+			 * 
+			 * You can also refer to "esp-idf:hcidefs.h" to HCI commands definitions.
 			 * 
 			 * 	Usage ex:
 			 * 		$ hcitool cmd 0x3F 0x026 0x09 0x05
 			 * 		It is possible to verify with
-			 * 		$ hcitool cmd 0x 		
+			 * 		$ hcitool cmd 0x08 0x007
 			 * 
 			 * See this link for more about HCI command OPCODE:
 			 * https://community.nxp.com/t5/Wireless-Connectivity-Knowledge/Custom-HCI-command/ta-p/1101555
