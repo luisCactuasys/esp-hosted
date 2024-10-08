@@ -527,37 +527,47 @@ void process_rx_pkt(interface_buffer_handle_t *buf_handle)
 		else if (buf_handle->if_type == ESP_HCI_IF) {
 			
 			ESP_LOG_BUFFER_HEXDUMP("H->S BT", payload, payload_len, ESP_LOG_INFO);
-                        if(!memcmp(payload, m3_PWlvl, sizeof(m3_PWlvl)))        //compare the command OPCODE, OGF, OCF for setting BLE TX power level
-                        {
-                                esp_err_t ret = 0;
-                                esp_ble_power_type_t power_type = payload[3];
-                                esp_power_level_t power_level = payload[4];
-                                /*
-                                        TODO: make a proper function to do this
-                                */
-                                ret = esp_ble_tx_power_set(power_type, power_level);
-								ESP_LOG_BUFFER_HEXDUMP("M3 - PWlvl", &ret, 4, ESP_LOG_INFO);
 
-								/*
-								 * Send the responde to Host Linux (TUX100)
-								*/
-								m3_buf_handle.if_type = ESP_HCI_IF;
-								m3_buf_handle.if_num = 0;
-
-								m3_buf_handle.payload = m3_resp_buf;
-								m3_buf_handle.payload_len = 10;
-
-								ret = send_to_host(PRIO_Q_LOW, &m3_buf_handle);
-
-                                ESP_LOG_BUFFER_HEXDUMP("M3 - PWlvl", &ret, 4, ESP_LOG_INFO);
-                        }
-                        else    // Fallback to normal operation (esp-hosted/esp-idf implementation)
-                        {
-                                process_hci_rx_pkt(payload, payload_len);
-                        }
-
+			/*
+			 * M3
+			 * Compare the command OPCODE, OGF, OCF for setting BLE TX power level
+			 * It has the following structure:
+			 * 	- OFG = 0x3F 	this is the code reserved to vendot specific commands
+			 *  - OCF = 0x026   M3 choosen, for maximum compatibility between products. As of the time of this development, 
+			 * This OCF is not being used, and it returns error - HCI_ERR_ILLEGAL_COMMAND. 
+			 *	- Power type	This is the type of channel to change the Transmission power. 0x09 for Advertisement 
+			 *  - Power level	This the level of the Transmission power for the given channel
+			 * 
+			 * Please refer to esp-idf:esp_bt.h for the possible values of Power type and Power level
+			 * 		- esp_ble_power_type_t
+			 * 		- esp_power_level_t
+			 * 
+			 * 	Usage ex:
+			 * 		$ hcitool cmd 0x3F 0x026 0x09 0x05
+			 * 		It is possible to verify with
+			 * 		$ hcitool cmd 0x 		
+			 * 
+			 * See this link for more about HCI command OPCODE:
+			 * https://community.nxp.com/t5/Wireless-Connectivity-Knowledge/Custom-HCI-command/ta-p/1101555
+			*/
+			if(!memcmp(payload, m3_PWlvl, sizeof(m3_PWlvl)))
+			{
+					esp_err_t ret = 0;
+					esp_ble_power_type_t power_type = payload[3];
+					esp_power_level_t power_level = payload[4];
+					
+					ret = esp_ble_tx_power_set(power_type, power_level);
+					ESP_LOG_BUFFER_HEXDUMP("M3 - PWlvl", &ret, 4, ESP_LOG_INFO);
+			}
 			
-			
+			/*
+			 * 	Continue with normal operation (esp-hosted/esp-idf implementation)
+			 * 	This allows for normal otperation in the case of the esp-idf commands for the BLE stack
+			 * 	It also allows for the Linux Host command to return, insted of hanging the shell.
+			 * 	It returns and error code -HCI_ERR_ILLEGAL_COMMAND. But it is no problem as we can verify
+			 * the power level with other command. 
+			*/
+			process_hci_rx_pkt(payload, payload_len);
 		}
 #endif
 		else if (buf_handle->if_type == ESP_TEST_IF) {
